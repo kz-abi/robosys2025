@@ -1,0 +1,39 @@
+#!/usr/bin/python3
+# SPDX-FileCopyrightText: 2025 kz-abi
+# SPDX-License-Identifier: BSD-3-Clause
+import sys
+
+def resistance_to_colors(value_str):
+    try:
+        text = value_str.strip().lower()
+        if 'k' in text:
+            if '.' in text:
+                val = int(float(text.replace('k', '')) * 1000)
+            else:
+                val = int(text.replace('k', '000'))
+        else:
+            val = int(text)
+
+        colors = ["⬛", "🟤", "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚪", "⚪"]
+        s = str(val)
+
+        if len(s) >= 2:
+            first = int(s[0])
+            second = int(s[1])
+            multiplier = len(s) - 2
+            if multiplier > 9: return "値が大きすぎます"
+            return f"{colors[first]} {colors[second]} {colors[multiplier]}"
+        else:
+            return f"⬛ {colors[int(s[0])]} ⬛"
+
+    except ValueError:
+        return "数値を入力してください"
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        print(resistance_to_colors(sys.argv[1]))
+    else:
+        for line in sys.stdin:
+            line = line.strip()
+            if line:
+                print(resistance_to_colors(line))
