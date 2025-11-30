@@ -1,39 +1,54 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2025 kz-abi
 # SPDX-License-Identifier: BSD-3-Clause
+
 import sys
 
+COLOR_MAP = {0: "⬛", 1: "🟤", 2: "🔴", 3: "🟠", 4: "🟡", 5: "🟢", 6: "🔵", 7: "🟣", 8: "⚪", 9: "⬜"}
+
+COLOR_MAP_KANJI_ONLY = {
+    0: "黒", 1: "茶", 2: "赤", 3: "橙", 4: "黄", 
+    5: "緑", 6: "青", 7: "紫", 8: "灰", 9: "白"
+}
+
 def resistance_to_colors(value_str):
-    try:
-        text = value_str.strip().lower()
-        if 'k' in text:
-            if '.' in text:
-                val = int(float(text.replace('k', '')) * 1000)
-            else:
-                val = int(text.replace('k', '000'))
+    text = value_str.strip().lower()
+    if 'k' in text:
+        if '.' in text:
+            val = int(float(text.replace('k', '')) * 1000)
         else:
+            val = int(text.replace('k', '000'))
+    else:
+        try:
             val = int(text)
+        except ValueError:
+            return "数値を入力してください"
 
-        colors = ["⬛", "🟤", "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚪", "⚪"]
-        s = str(val)
+    s = str(val)
+    if len(s) >= 2:
+        first = int(s[0])
+        second = int(s[1])
+        multiplier = len(s) - 2
 
-        if len(s) >= 2:
-            first = int(s[0])
-            second = int(s[1])
-            multiplier = len(s) - 2
-            if multiplier > 9: return "値が大きすぎます"
-            return f"{colors[first]} {colors[second]} {colors[multiplier]}"
-        else:
-            return f"⬛ {colors[int(s[0])]} ⬛"
+        if multiplier > 9: return "値が大きすぎます"
 
-    except ValueError:
-        return "数値を入力してください"
+        c_emoji = " ".join([COLOR_MAP[first], COLOR_MAP[second], COLOR_MAP[multiplier]])
+        c_kanji = " ".join([COLOR_MAP_KANJI_ONLY[first], COLOR_MAP_KANJI_ONLY[second], COLOR_MAP_KANJI_ONLY[multiplier]])
+
+        return f"{c_emoji} ({c_kanji})"
+    else:
+        c_emoji = " ".join([COLOR_MAP[0], COLOR_MAP[int(s[0])], COLOR_MAP[0]])
+        c_kanji = " ".join([COLOR_MAP_KANJI_ONLY[0], COLOR_MAP_KANJI_ONLY[int(s[0])], COLOR_MAP_KANJI_ONLY[0]])
+        return f"{c_emoji} ({c_kanji})"
 
 if __name__ == '__main__':
+    input_list = []
     if len(sys.argv) > 1:
-        print(resistance_to_colors(sys.argv[1]))
+        input_list = [sys.argv[1]]
     else:
         for line in sys.stdin:
-            line = line.strip()
-            if line:
-                print(resistance_to_colors(line))
+            input_list.append(line.strip())
+
+    for data in input_list:
+        if data:
+            print(resistance_to_colors(data))
